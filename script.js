@@ -159,14 +159,21 @@ function mergeUser(left, right, callback, limit = 10) {
 function displaySortedSongs() {
   choicesDiv.innerHTML = '';
   sortedList.innerHTML = '';
+
   sortedSongs.forEach((song, index) => {
-    const li = document.createElement('li');
-    li.textContent = `${index + 1}. ${song.songName} by ${song.songArtist}`;
-    sortedList.appendChild(li);
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td class="rank">${index + 1}</td>
+      <td class="song-title">${song.songName}</td>
+      <td class="song-artist">${song.songArtist}</td>
+    `;
+
+    sortedList.appendChild(tr);
   });
 
-  document.getElementById('sorted-header').style.display = 'block';
-  sortedList.style.display = 'block';
+
+  document.getElementById('sorted-wrapper').style.display = 'block';
 
 
   const comparisonDiv = document.createElement('div');

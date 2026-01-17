@@ -85,25 +85,13 @@ h1,
   margin-top: 20px;
   width: 80%;
   max-width: 800px;
+  display: none;
 }
 
 #sorted-header {
   text-align: center;
   margin-bottom: 10px;
-  display: none;
   font-size: 2em;
-}
-
-#sorted-list {
-  list-style-type: none;
-  padding-left: 0;
-  width: 100%;
-  text-align: left;
-  font-size: 1.2em;
-}
-
-#sorted-list li {
-  margin: 8px 0;
 }
 
 #comparison-div {
@@ -111,4 +99,47 @@ h1,
   color: #f0f0f0;
   margin-top: 10px;
   font-weight: bold;
+}
+
+#sorted-table {
+  width: 100%;
+  /* table fills its container */
+  border-collapse: collapse;
+  /* removes double borders */
+  table-layout: auto;
+  /* columns have consistent width */
+  font-size: 1em;
+  text-align: left;
+}
+
+#sorted-table th {
+  border: 1px solid #444;
+  padding: 8px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#sorted-table td {
+  border: 1px solid #444;
+  padding: 8px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#sorted-table th {
+  background-color: #222;
+  /* distinguish header */
+  color: #fff;
+}
+
+#sorted-table tbody tr:nth-child(even) {
+  background-color: #1a1a1a;
+  /* subtle striping for rows */
+}
+
+#sorted-table tbody tr:hover {
+  background-color: #333;
+  /* highlight on hover */
 }
