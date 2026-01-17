@@ -26,12 +26,20 @@ fetch('config.json')
     console.warn('Could not load config.json, using default topLimit = Infinity');
   });
 
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
 // Fetch songs from JSON
 fetch('songList.json')
   .then(res => res.json())
   .then(data => {
     songs = data.flat();
     console.log('Flattened song list:', songs);
+    shuffleArray(songs);
     startInteractiveMergeSort(songs);
   })
 
@@ -174,10 +182,12 @@ function displaySortedSongs() {
 
 
   document.getElementById('sorted-wrapper').style.display = 'block';
+  // document.getElementById('sorted-wrapper').style.removeProperty('display');
 
 
   const comparisonDiv = document.createElement('div');
   comparisonDiv.id = 'comparison-div';
   comparisonDiv.textContent = `Total Comparisons: ${comparisons}`;
-  sortedList.parentElement.appendChild(comparisonDiv);
+  document.getElementById('sorted-wrapper').appendChild(comparisonDiv);
+
 }
