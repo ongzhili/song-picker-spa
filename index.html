@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merge Sort Song Picker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>Pick Your Favorite Song</h1>
+  <label for="region-select">Select Region:</label>
+  <select id="region-select">
+    <option value="nae" selected>NA East</option>
+    <option value="naw">NA West</option>
+    <option value="eu">EU</option>
+  </select>
+  <div id="choices">
+  </div>
+
+  <div id="sorted-wrapper">
+    <h2 id="sorted-header">Sorted Choices:</h2>
+    <ul id="sorted-list"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
