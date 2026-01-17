@@ -23,7 +23,7 @@
 
 <body>
   <h1>Pick Your Favorite Song</h1>
-  <label for="region-select">Select Region:</label>
+  <label for="region-select">Select Region: (for AMQ links)</label>
   <select id="region-select">
     <option value="nae" selected>NA East</option>
     <option value="naw">NA West</option>
@@ -32,9 +32,18 @@
   <div id="choices">
   </div>
 
+  <h2 id="sorted-header">Rankings</h2>
   <div id="sorted-wrapper">
-    <h2 id="sorted-header">Sorted Choices:</h2>
-    <ul id="sorted-list"></ul>
+    <table id="sorted-table">
+      <thead>
+        <tr>
+          <th>fuuuuuuuck css</th>
+          <th>Song Name</th>
+          <th>Artist</th>
+        </tr>
+      </thead>
+      <tbody id="sorted-list"></tbody>
+    </table>
   </div>
 
   <script src="script.js"></script>
