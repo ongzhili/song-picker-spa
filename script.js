@@ -110,33 +110,49 @@ function getMediaElement(music) {
 }
 
 
-// Recursive interactive merge sort
 function startInteractiveMergeSort(array) {
   comparisons = 0;
-  interactiveMergeSort(array, sorted => {
-    // Once sorting is done
+  breadthFirstMergeSort(array, sorted => {
     sortedSongs = sorted;
     displaySortedSongs();
-  });
+  }, topLimit);
 }
 
-function interactiveMergeSort(arr, callback) {
-  if (arr.length <= 1) {
-    callback(arr);
-    return;
+function breadthFirstMergeSort(arr, callback, limit = Infinity) {
+  let queue = arr.map(item => [item]); // treat each song as a mini-array
+
+  function nextLevel() {
+    if (queue.length === 1) {
+      callback(queue[0].slice(0, limit));
+      return;
+    }
+
+    const nextQueue = [];
+    let i = 0;
+
+    function mergePair() {
+      if (i >= queue.length) {
+        queue = nextQueue;
+        nextLevel();
+        return;
+      }
+
+      const left = queue[i];
+      const right = queue[i + 1] || [];
+
+      mergeUser(left, right, merged => {
+        nextQueue.push(merged);
+        i += 2;
+        mergePair();
+      }, limit);
+    }
+
+    mergePair();
   }
 
-  const mid = Math.floor(arr.length / 2);
-  interactiveMergeSort(arr.slice(0, mid), left => {
-    interactiveMergeSort(arr.slice(mid), right => {
-      mergeUser(left, right, merged => {
-        callback(merged);
-      }, topLimit);
-    });
-  });
+  nextLevel();
 }
 
-// Merge with user input
 function mergeUser(left, right, callback, limit = 10) {
   const merged = [];
 
@@ -214,10 +230,7 @@ function displaySortedSongs() {
     sortedList.appendChild(tr);
   });
 
-
   document.getElementById('sorted-wrapper').style.display = 'block';
-  // document.getElementById('sorted-wrapper').style.removeProperty('display');
-
 
   const comparisonDiv = document.createElement('div');
   comparisonDiv.id = 'comparison-div';
