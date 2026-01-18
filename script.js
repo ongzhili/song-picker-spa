@@ -65,47 +65,58 @@ const choicesDiv = document.getElementById('choices');
 const sortedList = document.getElementById('sorted-list');
 
 function getMediaElement(music) {
-  console.log('[getMediaElement] called with:', music);
-
-  if (!music) {
-    console.error('[getMediaElement] music is undefined or null');
-    return '<div>Invalid song</div>';
+  if (mediaCache[music.name]) {
+    return mediaCache[music.name].outerHTML;
   }
 
-  if (!music.songName) {
-    console.warn('[getMediaElement] missing songName:', music);
-  }
+  let mediaSrc = null;
 
-  // Cache hit
-  if (mediaCache[music.songName]) {
-    console.log('[getMediaElement] cache hit for:', music.songName);
-    return mediaCache[music.songName];
+  // 🔹 Priority: HQ → MQ → video
+  if (music.HQ) {
+    mediaSrc = music.HQ;
+  } else if (music.MQ) {
+    mediaSrc = music.MQ;
+  } else if (music.video) {
+    mediaSrc = music.video;
   }
-
-  console.log('[getMediaElement] cache miss for:', music.songName);
 
   let videoElement;
 
-  if (!music.video && !music.audio) {
+  if (!mediaSrc && !music.audio && !music.mp3) {
     videoElement = '<div>Video and MP3 not available</div>';
-  } else if (music.video) {
-    if (music.video.includes('youtube.com')) {
-      const videoId = new URL(music.video).searchParams.get('v');
-      videoElement = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-    } else if (music.video.endsWith('.webm') || music.video.endsWith('.mp4')) {
-      videoFileName = music.video.split('/').pop();
-      console.log(videoFileName);
-      videoElement = `<video controls><source src="https://${region}dist.animemusicquiz.com/${videoFileName}" type="video/webm"></video>`;
-    } else {
+  }
+  else if (mediaSrc) {
+    if (mediaSrc.includes('youtube.com')) {
+      const videoId = new URL(mediaSrc).searchParams.get('v');
+      videoElement = `
+        <iframe 
+          src="https://www.youtube-nocookie.com/embed/${videoId}" 
+          frameborder="0" 
+          allowfullscreen>
+        </iframe>`;
+    }
+    else if (mediaSrc.endsWith('.webm') || mediaSrc.endsWith('.mp4')) {
+      const videoFileName = mediaSrc.split('/').pop();
+      videoElement = `
+        <video controls>
+          <source src="https://${region}dist.animemusicquiz.com/${videoFileName}" type="video/webm">
+        </video>`;
+    }
+    else {
       videoElement = '<div>Video not available</div>';
     }
-  } else if (music.mp3) {
-    videoElement = `<audio controls><source src="${music.mp3}" type="audio/mp3"></audio>`;
-  } else {
+  }
+  else if (music.mp3 || music.audio) {
+    const audioSrc = music.mp3 || music.audio;
+    videoElement = `
+      <audio controls>
+        <source src="${audioSrc}" type="audio/mp3">
+      </audio>`;
+  }
+  else {
     videoElement = '<div>MP3 not available!</div>';
   }
 
-  mediaCache[music.songName] = videoElement;
   return videoElement;
 }
 
