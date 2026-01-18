@@ -6,25 +6,17 @@ let region = 'nae'; // default
 const mediaCache = {}; // key = song id or name, value = HTML element
 const regionSelect = document.getElementById('region-select');
 
+const startBtn = document.getElementById('start-btn');
+const songListInput = document.getElementById('songlist-input');
+const topLimitInput = document.getElementById('toplimit-input');
+const setupDiv = document.getElementById('setup');
+
 
 regionSelect.addEventListener('change', () => {
   region = regionSelect.value;      // update region
   Object.keys(mediaCache).forEach(key => delete mediaCache[key]); // clear cache
   console.log('Region changed to', region, '- cache cleared');
 });
-
-
-fetch('config.json')
-  .then(res => res.json())
-  .then(config => {
-    if (config.topLimit !== undefined && !isNaN(config.topLimit)) {
-      topLimit = config.topLimit;
-    }
-    console.log('Top limit from config:', topLimit);
-  })
-  .catch(err => {
-    console.warn('Could not load config.json, using default topLimit = Infinity');
-  });
 
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -33,23 +25,64 @@ function shuffleArray(arr) {
   }
 }
 
-// Fetch songs from JSON
-fetch('songList.json')
-  .then(res => res.json())
-  .then(data => {
-    songs = data.flat();
-    console.log('Flattened song list:', songs);
-    shuffleArray(songs);
-    startInteractiveMergeSort(songs);
-  })
+startBtn.addEventListener('click', () => {
+  const file = songListInput.files[0];
+  if (!file) {
+    alert('Please upload a song list JSON file');
+    return;
+  }
+
+  const parsedLimit = Number(topLimitInput.value);
+  topLimit = !isNaN(parsedLimit) && parsedLimit > 0 ? parsedLimit : Infinity;
+
+  setupDiv.style.display = 'none';
+
+  loadSongsFromFile(file);
+});
+
+function loadSongsFromFile(file) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      songs = data.flat();
+
+      console.log('Loaded songs from file:', songs);
+
+      shuffleArray(songs);
+      startInteractiveMergeSort(songs);
+    } catch (err) {
+      alert('Invalid JSON file');
+      console.error(err);
+    }
+  };
+
+  reader.readAsText(file);
+}
 
 const choicesDiv = document.getElementById('choices');
 const sortedList = document.getElementById('sorted-list');
 
 function getMediaElement(music) {
-  if (mediaCache[music.name]) {
-    return mediaCache[music.name].outerHTML; // return cached element
+  console.log('[getMediaElement] called with:', music);
+
+  if (!music) {
+    console.error('[getMediaElement] music is undefined or null');
+    return '<div>Invalid song</div>';
   }
+
+  if (!music.songName) {
+    console.warn('[getMediaElement] missing songName:', music);
+  }
+
+  // Cache hit
+  if (mediaCache[music.songName]) {
+    console.log('[getMediaElement] cache hit for:', music.songName);
+    return mediaCache[music.songName];
+  }
+
+  console.log('[getMediaElement] cache miss for:', music.songName);
 
   let videoElement;
 
@@ -72,6 +105,7 @@ function getMediaElement(music) {
     videoElement = '<div>MP3 not available!</div>';
   }
 
+  mediaCache[music.songName] = videoElement;
   return videoElement;
 }
 
