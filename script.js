@@ -320,11 +320,24 @@ function mergeUser(left, right, callback, limit = 10) {
         nextComparison();
       };
 
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'skip-btn';
+      skipBtn.textContent = 'Skip (Removes permanently!!)';
+      skipBtn.onclick = () => {
+        if (index === 0) left.shift();
+        else right.shift();
+        nextComparison();
+      };
+
+      const actionButtonsDiv = document.createElement('div');
+      actionButtonsDiv.className = 'action-buttons';
+
       buttonsDiv.appendChild(showVideoBtn);
       buttonsDiv.appendChild(showAudioBtn);
       optionDiv.appendChild(buttonsDiv);
-      optionDiv.appendChild(chooseBtn);
-
+      actionButtonsDiv.appendChild(chooseBtn);
+      actionButtonsDiv.appendChild(skipBtn);
+      optionDiv.appendChild(actionButtonsDiv);
       choicesDiv.appendChild(optionDiv);
     });
   }
