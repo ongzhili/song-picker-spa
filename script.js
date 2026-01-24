@@ -183,6 +183,33 @@ function breadthFirstMergeSort(arr, callback, limit = Infinity) {
   nextLevel();
 }
 
+function createSongInfoElements(song) {
+  const infoContainer = document.createElement('div');
+  infoContainer.className = 'song-info';
+
+  // Song name
+  const nameP = document.createElement('p');
+  nameP.className = 'song-name-text';
+  nameP.textContent = song.songName;
+  infoContainer.appendChild(nameP);
+
+  // Artist name
+  const artistP = document.createElement('p');
+  artistP.className = 'song-artist-text';
+  artistP.textContent = song.songArtist;
+  infoContainer.appendChild(artistP);
+
+  // Anime name (if exists)
+  if (song.animeName) {
+    const animeP = document.createElement('p');
+    animeP.className = 'song-anime-text';
+    animeP.textContent = song.animeName;
+    infoContainer.appendChild(animeP);
+  }
+
+  return infoContainer;
+}
+
 function mergeUser(left, right, callback, limit = 10) {
   const merged = [];
 
@@ -214,14 +241,12 @@ function mergeUser(left, right, callback, limit = 10) {
       const optionDiv = document.createElement('div');
       optionDiv.className = 'song-option';
 
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'song-name';
-      nameDiv.textContent = `${song.songName} by ${song.songArtist}`;
+      const songInfo = createSongInfoElements(song);
+      optionDiv.appendChild(songInfo);
 
       let mediaDiv = null; // Don't create yet
       let currentMediaType = null; // Track which media is currently shown
 
-      // NEW: Create buttons container
       const buttonsDiv = document.createElement('div');
       buttonsDiv.className = 'media-buttons';
 
@@ -295,7 +320,6 @@ function mergeUser(left, right, callback, limit = 10) {
         nextComparison();
       };
 
-      optionDiv.appendChild(nameDiv);
       buttonsDiv.appendChild(showVideoBtn);
       buttonsDiv.appendChild(showAudioBtn);
       optionDiv.appendChild(buttonsDiv);
@@ -320,6 +344,7 @@ function displaySortedSongs() {
       <td class="rank">${index + 1}</td>
       <td class="song-title">${song.songName}</td>
       <td class="song-artist">${song.songArtist}</td>
+      <td class="song-anime">${song.animeName || 'None'}</td>
     `;
 
     sortedList.appendChild(tr);
