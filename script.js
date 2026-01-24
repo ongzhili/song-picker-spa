@@ -6,6 +6,11 @@ let region = 'nae'; // default
 const mediaCache = {}; // key = song id or name, value = HTML element
 const regionSelect = document.getElementById('region-select');
 
+const MEDIA = {
+  VIDEO: 'video',
+  AUDIO: 'audio',
+};
+
 const startBtn = document.getElementById('start-btn');
 const songListInput = document.getElementById('songlist-input');
 const topLimitInput = document.getElementById('toplimit-input');
@@ -64,11 +69,26 @@ function loadSongsFromFile(file) {
 const choicesDiv = document.getElementById('choices');
 const sortedList = document.getElementById('sorted-list');
 
-function getMediaElement(music) {
-  if (mediaCache[music.name]) {
-    return mediaCache[music.name].outerHTML;
+function getMediaElement(music, mediaType) {
+  const SEPARATOR = '|';
+  if (mediaCache[music.name + SEPARATOR + mediaType]) {
+    return mediaCache[music.name + SEPARATOR + mediaType].outerHTML;
   }
 
+  let videoElement;
+
+  if (mediaType === MEDIA.VIDEO) {
+    videoElement = getVideoElement(music);
+  } else if (mediaType === MEDIA.AUDIO) {
+    videoElement = getAudioElement(music);
+  } else {
+    videoElement = '<div>Media type not supported</div>';
+  }
+
+  return videoElement;
+}
+
+function getVideoElement(music) {
   let mediaSrc = null;
 
   // 🔹 Priority: HQ → MQ → video
@@ -80,44 +100,43 @@ function getMediaElement(music) {
     mediaSrc = music.video;
   }
 
-  let videoElement;
-
-  if (!mediaSrc && !music.audio && !music.mp3) {
-    videoElement = '<div>Video and MP3 not available</div>';
-  }
-  else if (mediaSrc) {
-    if (mediaSrc.includes('youtube.com')) {
-      const videoId = new URL(mediaSrc).searchParams.get('v');
-      videoElement = `
-        <iframe 
-          src="https://www.youtube-nocookie.com/embed/${videoId}" 
-          frameborder="0" 
-          allowfullscreen>
-        </iframe>`;
-    }
-    else if (mediaSrc.endsWith('.webm') || mediaSrc.endsWith('.mp4')) {
-      const videoFileName = mediaSrc.split('/').pop();
-      videoElement = `
-        <video controls>
-          <source src="https://${region}dist.animemusicquiz.com/${videoFileName}" type="video/webm">
-        </video>`;
-    }
-    else {
-      videoElement = '<div>Video not available</div>';
-    }
-  }
-  else if (music.mp3 || music.audio) {
-    const audioSrc = music.mp3 || music.audio;
-    videoElement = `
-      <audio controls>
-        <source src="${audioSrc}" type="audio/mp3">
-      </audio>`;
-  }
-  else {
-    videoElement = '<div>MP3 not available!</div>';
+  if (!mediaSrc) {
+    return '<div>Video not available</div>';
   }
 
-  return videoElement;
+  if (mediaSrc.includes('youtube.com')) {
+    const videoId = new URL(mediaSrc).searchParams.get('v');
+    return `
+      <iframe 
+        src="https://www.youtube-nocookie.com/embed/${videoId}" 
+        frameborder="0" 
+        allowfullscreen>
+      </iframe>`;
+  }
+
+  if (mediaSrc.endsWith('.webm') || mediaSrc.endsWith('.mp4')) {
+    const videoFileName = mediaSrc.split('/').pop();
+    return `
+      <video controls>
+        <source src="https://${region}dist.animemusicquiz.com/${videoFileName}" type="video/webm">
+      </video>`;
+  }
+
+  return '<div>Video not available</div>';
+
+}
+
+function getAudioElement(music) {
+  const audioSrc = music.mp3 || music.audio;
+
+  if (!audioSrc) {
+    return '<div>MP3 not available!</div>';
+  }
+
+  return `
+    <audio controls>
+      <source src="${audioSrc}" type="audio/mp3">
+    </audio>`;
 }
 
 
@@ -164,6 +183,33 @@ function breadthFirstMergeSort(arr, callback, limit = Infinity) {
   nextLevel();
 }
 
+function createSongInfoElements(song) {
+  const infoContainer = document.createElement('div');
+  infoContainer.className = 'song-info';
+
+  // Song name
+  const nameP = document.createElement('p');
+  nameP.className = 'song-name-text';
+  nameP.textContent = song.songName;
+  infoContainer.appendChild(nameP);
+
+  // Artist name
+  const artistP = document.createElement('p');
+  artistP.className = 'song-artist-text';
+  artistP.textContent = song.songArtist;
+  infoContainer.appendChild(artistP);
+
+  // Anime name (if exists)
+  if (song.animeName) {
+    const animeP = document.createElement('p');
+    animeP.className = 'song-anime-text';
+    animeP.textContent = song.animeName;
+    infoContainer.appendChild(animeP);
+  }
+
+  return infoContainer;
+}
+
 function mergeUser(left, right, callback, limit = 10) {
   const merged = [];
 
@@ -195,27 +241,89 @@ function mergeUser(left, right, callback, limit = 10) {
       const optionDiv = document.createElement('div');
       optionDiv.className = 'song-option';
 
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'song-name';
-      nameDiv.textContent = `${song.songName} by ${song.songArtist}`;
+      const songInfo = createSongInfoElements(song);
+      optionDiv.appendChild(songInfo);
 
-      const mediaDiv = document.createElement('div');
-      mediaDiv.className = 'media-container';
-      mediaDiv.innerHTML = getMediaElement(song); // reuse your cached media
+      let mediaDiv = null; // Don't create yet
+      let currentMediaType = null; // Track which media is currently shown
 
-      const btn = document.createElement('button');
-      btn.className = 'choose-btn';
-      btn.textContent = 'Choose';
-      btn.onclick = () => {
+      const buttonsDiv = document.createElement('div');
+      buttonsDiv.className = 'media-buttons';
+
+      const showVideoBtn = document.createElement('button');
+      showVideoBtn.className = 'show-media-btn';
+      showVideoBtn.textContent = 'Show Video';
+
+      const showAudioBtn = document.createElement('button');
+      showAudioBtn.className = 'show-media-btn';
+      showAudioBtn.textContent = 'Show Audio';
+
+      showVideoBtn.onclick = () => {
+        if (!mediaDiv) {
+          mediaDiv = document.createElement('div');
+          mediaDiv.className = 'media-container';
+          mediaDiv.innerHTML = getMediaElement(song, MEDIA.VIDEO);
+          optionDiv.insertBefore(mediaDiv, buttonsDiv);
+          currentMediaType = MEDIA.VIDEO;
+          showVideoBtn.textContent = 'Hide Video';
+          showAudioBtn.textContent = 'Show Audio';
+        } else if (currentMediaType === MEDIA.VIDEO) {
+          optionDiv.removeChild(mediaDiv);
+          mediaDiv = null;
+          currentMediaType = null;
+          showVideoBtn.textContent = 'Show Video';
+        } else {
+          optionDiv.removeChild(mediaDiv);
+          mediaDiv = document.createElement('div');
+          mediaDiv.className = 'media-container';
+          mediaDiv.innerHTML = getMediaElement(song, MEDIA.VIDEO);
+          optionDiv.insertBefore(mediaDiv, buttonsDiv);
+          currentMediaType = MEDIA.VIDEO;
+          showVideoBtn.textContent = 'Hide Video';
+          showAudioBtn.textContent = 'Show Audio';
+        }
+      };
+
+      showAudioBtn.onclick = () => {
+        if (!mediaDiv) {
+          mediaDiv = document.createElement('div');
+          mediaDiv.className = 'media-container';
+          mediaDiv.innerHTML = getMediaElement(song, MEDIA.AUDIO);
+          optionDiv.insertBefore(mediaDiv, buttonsDiv);
+          currentMediaType = MEDIA.AUDIO;
+          showAudioBtn.textContent = 'Hide Audio';
+          showVideoBtn.textContent = 'Show Video';
+        } else if (currentMediaType === MEDIA.AUDIO) {
+          optionDiv.removeChild(mediaDiv);
+          mediaDiv = null;
+          currentMediaType = null;
+          showAudioBtn.textContent = 'Show Audio';
+        } else {
+          optionDiv.removeChild(mediaDiv);
+          mediaDiv = document.createElement('div');
+          mediaDiv.className = 'media-container';
+          mediaDiv.innerHTML = getMediaElement(song, MEDIA.AUDIO);
+          optionDiv.insertBefore(mediaDiv, buttonsDiv);
+          currentMediaType = MEDIA.AUDIO;
+          showAudioBtn.textContent = 'Hide Audio';
+          showVideoBtn.textContent = 'Show Video';
+        }
+      };
+
+      const chooseBtn = document.createElement('button');
+      chooseBtn.className = 'choose-btn';
+      chooseBtn.textContent = 'Choose';
+      chooseBtn.onclick = () => {
         if (index === 0) merged.push(left.shift());
         else merged.push(right.shift());
         comparisons++;
         nextComparison();
       };
 
-      optionDiv.appendChild(nameDiv);
-      optionDiv.appendChild(mediaDiv);
-      optionDiv.appendChild(btn);
+      buttonsDiv.appendChild(showVideoBtn);
+      buttonsDiv.appendChild(showAudioBtn);
+      optionDiv.appendChild(buttonsDiv);
+      optionDiv.appendChild(chooseBtn);
 
       choicesDiv.appendChild(optionDiv);
     });
@@ -236,6 +344,7 @@ function displaySortedSongs() {
       <td class="rank">${index + 1}</td>
       <td class="song-title">${song.songName}</td>
       <td class="song-artist">${song.songArtist}</td>
+      <td class="song-anime">${song.animeName || 'None'}</td>
     `;
 
     sortedList.appendChild(tr);

@@ -143,3 +143,57 @@ h1,
   background-color: #333;
   /* highlight on hover */
 }
+
+.media-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.show-media-btn {
+  padding: 10px 16px;
+  font-size: 0.95em;
+  border: none;
+  border-radius: 6px;
+  background-color: #1f5a96;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  flex: 1;
+  max-width: 150px;
+  font-weight: 500;
+}
+
+.show-media-btn:hover {
+  background-color: #1a4a7a;
+  transform: translateY(-2px);
+}
+
+.show-media-btn:active {
+  transform: translateY(0);
+}
+
+p.song-name-text,
+p.song-artist-text,
+p.song-anime-text {
+  margin: 5px 0;
+  font-size: 0.95em;
+  color: #b0b0b0;
+}
+
+p.song-name-text {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 1em;
+}
+
+p.song-artist-text {
+  font-style: italic;
+  color: #a0a0a0;
+}
+
+p.song-anime-text {
+  font-size: 0.9em;
+  color: #808080;
+}
