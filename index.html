@@ -25,32 +25,34 @@
 <body>
   <h1>Pick Your Favorite Song</h1>
 
+  <div id="region-container">
+    <label for="region-select">Select Region: (for AMQ links)</label>
+    <select id="region-select">
+      <option value="nae" selected>NA East</option>
+      <option value="naw">NA West</option>
+      <option value="eu">EU</option>
+    </select>
+  </div>
+
   <div id="setup">
     <h2>Setup</h2>
 
-    <label>
-      Upload song list (JSON):
-      <input id="songlist-input" type="file" accept=".json">
+    <label for="songlist-input">
+      songList (json):
     </label>
+    <input id="songlist-input" type="file" accept=".json">
 
     <br><br>
 
-    <label>
+    <label for="toplimit-input">
       Top limit:
-      <input id="toplimit-input" type="number" placeholder="∞ (no limit)">
     </label>
+    <input id="toplimit-input" type="number" placeholder="∞ (no limit)">
 
     <br><br>
 
     <button id="start-btn">Start</button>
   </div>
-
-  <label for="region-select">Select Region: (for AMQ links)</label>
-  <select id="region-select">
-    <option value="nae" selected>NA East</option>
-    <option value="naw">NA West</option>
-    <option value="eu">EU</option>
-  </select>
   <div id="choices">
   </div>
 
