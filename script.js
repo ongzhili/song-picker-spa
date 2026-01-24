@@ -199,14 +199,29 @@ function mergeUser(left, right, callback, limit = 10) {
       nameDiv.className = 'song-name';
       nameDiv.textContent = `${song.songName} by ${song.songArtist}`;
 
-      const mediaDiv = document.createElement('div');
-      mediaDiv.className = 'media-container';
-      mediaDiv.innerHTML = getMediaElement(song); // reuse your cached media
+      let mediaDiv = null; // Don't create yet
 
-      const btn = document.createElement('button');
-      btn.className = 'choose-btn';
-      btn.textContent = 'Choose';
-      btn.onclick = () => {
+      const showMediaBtn = document.createElement('button');
+      showMediaBtn.className = 'show-media-btn';
+      showMediaBtn.textContent = 'Show Media';
+      showMediaBtn.onclick = () => {
+        if (!mediaDiv) {
+          mediaDiv = document.createElement('div');
+          mediaDiv.className = 'media-container';
+          mediaDiv.innerHTML = getMediaElement(song);
+          optionDiv.insertBefore(mediaDiv, chooseBtn);
+          showMediaBtn.textContent = 'Hide Media';
+        } else {
+          optionDiv.removeChild(mediaDiv);
+          mediaDiv = null;
+          showMediaBtn.textContent = 'Show Media';
+        }
+      };
+
+      const chooseBtn = document.createElement('button');
+      chooseBtn.className = 'choose-btn';
+      chooseBtn.textContent = 'Choose';
+      chooseBtn.onclick = () => {
         if (index === 0) merged.push(left.shift());
         else merged.push(right.shift());
         comparisons++;
@@ -214,8 +229,8 @@ function mergeUser(left, right, callback, limit = 10) {
       };
 
       optionDiv.appendChild(nameDiv);
-      optionDiv.appendChild(mediaDiv);
-      optionDiv.appendChild(btn);
+      optionDiv.appendChild(showMediaBtn);
+      optionDiv.appendChild(chooseBtn);
 
       choicesDiv.appendChild(optionDiv);
     });
