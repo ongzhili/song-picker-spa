@@ -210,6 +210,32 @@ function createSongInfoElements(song) {
   return infoContainer;
 }
 
+function destroyMediaContainer(containerDiv) {
+  if (!containerDiv) return;
+
+  // Find audio or video inside the container
+  const mediaEl = containerDiv.querySelector('audio, video, iframe');
+
+  if (mediaEl) {
+    try {
+      // 1. Stop playback immediately
+      mediaEl.pause();
+
+      // 2. Firefox-safe teardown
+      mediaEl.removeAttribute('src');
+      mediaEl.load();
+    } catch (e) {
+      // Defensive: media might already be detached
+      console.log('Media cleanup failed:', e);
+    }
+  }
+
+  // 3. Remove the container from the DOM (Chrome + Firefox)
+  if (containerDiv.parentNode) {
+    containerDiv.parentNode.removeChild(containerDiv);
+  }
+}
+
 function mergeUser(left, right, callback, limit = 10) {
   const merged = [];
 
@@ -268,12 +294,12 @@ function mergeUser(left, right, callback, limit = 10) {
           showVideoBtn.textContent = 'Hide Video';
           showAudioBtn.textContent = 'Show Audio';
         } else if (currentMediaType === MEDIA.VIDEO) {
-          optionDiv.removeChild(mediaDiv);
+          destroyMediaContainer(mediaDiv);
           mediaDiv = null;
           currentMediaType = null;
           showVideoBtn.textContent = 'Show Video';
         } else {
-          optionDiv.removeChild(mediaDiv);
+          destroyMediaContainer(mediaDiv);
           mediaDiv = document.createElement('div');
           mediaDiv.className = 'media-container';
           mediaDiv.innerHTML = getMediaElement(song, MEDIA.VIDEO);
@@ -294,12 +320,12 @@ function mergeUser(left, right, callback, limit = 10) {
           showAudioBtn.textContent = 'Hide Audio';
           showVideoBtn.textContent = 'Show Video';
         } else if (currentMediaType === MEDIA.AUDIO) {
-          optionDiv.removeChild(mediaDiv);
+          destroyMediaContainer(mediaDiv);
           mediaDiv = null;
           currentMediaType = null;
           showAudioBtn.textContent = 'Show Audio';
         } else {
-          optionDiv.removeChild(mediaDiv);
+          destroyMediaContainer(mediaDiv);
           mediaDiv = document.createElement('div');
           mediaDiv.className = 'media-container';
           mediaDiv.innerHTML = getMediaElement(song, MEDIA.AUDIO);
