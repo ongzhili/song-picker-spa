@@ -3,12 +3,17 @@ let sortedSongs = [];
 let comparisons = 0;
 let topLimit = Infinity;
 let region = 'nae'; // default
-const mediaCache = {}; // key = song id or name, value = HTML element
 const regionSelect = document.getElementById('region-select');
 
 const MEDIA = {
   VIDEO: 'video',
   AUDIO: 'audio',
+};
+
+const songTypeMap = {
+  1: "OP",
+  2: "ED",
+  3: "INS"
 };
 
 const startBtn = document.getElementById('start-btn');
@@ -70,10 +75,6 @@ const choicesDiv = document.getElementById('choices');
 const sortedList = document.getElementById('sorted-list');
 
 function getMediaElement(music, mediaType) {
-  const SEPARATOR = '|';
-  if (mediaCache[music.name + SEPARATOR + mediaType]) {
-    return mediaCache[music.name + SEPARATOR + mediaType].outerHTML;
-  }
 
   let videoElement;
 
@@ -91,7 +92,6 @@ function getMediaElement(music, mediaType) {
 function getVideoElement(music) {
   let mediaSrc = null;
 
-  // 🔹 Priority: HQ → MQ → video
   if (music.HQ) {
     mediaSrc = music.HQ;
   } else if (music.MQ) {
@@ -133,6 +133,14 @@ function getAudioElement(music) {
     return '<div>MP3 not available!</div>';
   }
 
+  if (audioSrc.endsWith('.mp3')) {
+    const audioFileName = audioSrc.split('/').pop();
+    return `
+      <audio controls>
+        <source src="https://${region}dist.animemusicquiz.com/${audioFileName}" type="video/webm">
+      </audio>`;
+  }
+
   return `
     <audio controls>
       <source src="${audioSrc}" type="audio/mp3">
@@ -149,7 +157,7 @@ function startInteractiveMergeSort(array) {
 }
 
 function breadthFirstMergeSort(arr, callback, limit = Infinity) {
-  let queue = arr.map(item => [item]); // treat each song as a mini-array
+  let queue = arr.map(item => [item]);
 
   function nextLevel() {
     if (queue.length === 1) {
@@ -205,6 +213,13 @@ function createSongInfoElements(song) {
     animeP.className = 'song-anime-text';
     animeP.textContent = song.animeName;
     infoContainer.appendChild(animeP);
+  }
+
+  if (song.songType) {
+    const songTypeP = document.createElement('p');
+    songTypeP.className = 'song-type-text';
+    songTypeP.textContent = songTypeMap[song.songType];
+    infoContainer.appendChild(songTypeP);
   }
 
   return infoContainer;
@@ -350,6 +365,7 @@ function displaySortedSongs() {
   choicesDiv.innerHTML = '';
   sortedList.innerHTML = '';
 
+  console.log('Sorted Songs: ', sortedSongs);
   sortedSongs.forEach((song, index) => {
     const tr = document.createElement('tr');
 
@@ -369,5 +385,20 @@ function displaySortedSongs() {
   comparisonDiv.id = 'comparison-div';
   comparisonDiv.textContent = `Total Comparisons: ${comparisons}`;
   document.getElementById('sorted-wrapper').appendChild(comparisonDiv);
+
+  const exportBtn = document.createElement('button');
+  exportBtn.id = 'export-btn';
+  exportBtn.textContent = 'Export as JSON';
+  exportBtn.onclick = () => {
+    const jsonStr = JSON.stringify(sortedSongs, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sorted-songs.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  document.getElementById('sorted-wrapper').appendChild(exportBtn);
 
 }
