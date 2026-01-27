@@ -14,6 +14,8 @@ Sets the application to return your top X songs, where X is song limit. Defaults
 
 # songList.json
 
+A sample is provided! Default templates coming soon!
+
 ```json
 {
   "songName": "<song_name>",
@@ -30,4 +32,5 @@ Sets the application to return your top X songs, where X is song limit. Defaults
 3. `video`: video file name (for amq file links) / youtube hyperlink (youtube)
 4. `audio`: mp3 file name (for amq file links)
 5. `songType`: Type of song (0 = OP, 1 = ED, 2 = INS) (amq thing)
+
 
