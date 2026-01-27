@@ -20,7 +20,7 @@ Sets the application to return your top X songs, where X is song limit. Defaults
   "songArtist": "<artist>",
   "video": "<video_file_name> or <youtube link>",
   "audio": "<mp3_file_name>",
-  "songType": 0/1/2 (OP/ED/INS)
+  "songType": "<1/2/3> (Corresponding to OP/ED/INS)"
 }
 
 ```
