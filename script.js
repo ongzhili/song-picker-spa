@@ -114,6 +114,16 @@ function getVideoElement(music) {
       </iframe>`;
   }
 
+  if (mediaSrc.includes('drive.google.com')) {
+    const urlParts = mediaSrc.split('/')
+    const fileIdIndex = urlParts.indexOf('d') + 1
+    const fileId = urlParts[fileIdIndex]
+
+    return `
+      <iframe src="https://drive.google.com/file/d/${fileId}/preview" width="640" height="480"></iframe>
+    `
+  }
+
   if (mediaSrc.endsWith('.webm') || mediaSrc.endsWith('.mp4')) {
     const videoFileName = mediaSrc.split('/').pop();
     return `
@@ -131,6 +141,16 @@ function getAudioElement(music) {
 
   if (!audioSrc) {
     return '<div>MP3 not available!</div>';
+  }
+
+  if (audioSrc.includes('drive.google.com')) {
+    const urlParts = audioSrc.split('/')
+    const fileIdIndex = urlParts.indexOf('d') + 1
+    const fileId = urlParts[fileIdIndex]
+
+    return `
+    <iframe src="https://drive.google.com/file/d/${fileId}/preview" width="640" height="480"></iframe>
+    `
   }
 
   if (audioSrc.endsWith('.mp3')) {
