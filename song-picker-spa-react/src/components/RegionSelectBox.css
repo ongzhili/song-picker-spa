@@ -1,0 +1,41 @@
+#region-container {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  text-align: center;
+}
+
+#region-container label {
+  display: block;
+  color: #e0e0e0;
+  margin-bottom: 12px;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+#region-select {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+#region-select:hover,
+#region-select:focus {
+  border-color: #1f5a96;
+  outline: none;
+}
+
+#region-select option {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}

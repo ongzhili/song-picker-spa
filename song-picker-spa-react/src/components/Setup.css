@@ -1,0 +1,62 @@
+#setup {
+  max-width: 500px;
+  margin: 0 auto 40px;
+  padding: 30px;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#setup h2 {
+  color: #ffffff;
+  margin-top: 0;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+#setup label {
+  display: inline-block;
+  color: #e0e0e0;
+  margin-right: 10px;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+#setup input[type="file"],
+#setup input[type="number"] {
+  display: inline-block;
+  padding: 8px 12px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 0.95em;
+  cursor: pointer;
+}
+
+#setup input[type="file"]:hover,
+#setup input[type="number"]:focus {
+  border-color: #1f5a96;
+  outline: none;
+}
+
+#setup button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #1f5a96;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+#setup button:hover {
+  background-color: #1a4a7a;
+  transform: translateY(-2px);
+}
