@@ -1,20 +1,26 @@
 import './App.css';
 import Setup from './components/Setup';
-import { useState } from 'react';
 import { GAMESTATUS, CATBOXREGION } from './utils/constants';
 import RegionSelectBox from './components/RegionSelectBox';
+import ChoiceContainer from './components/game/ChoiceContainer';
+import { useGameStore } from './utils/gameState/stateStore';
 
 export default function MyApp() {
-  const [gameStatus, setGameStatus] = useState(GAMESTATUS.pregame);
-  const [region, setRegion] = useState(CATBOXREGION.nae);
-  const [gameState, setGameState] = useState('');
+  const { 
+    gameStatus, 
+    setGameStatus, 
+    region, 
+    setRegion,
+    resetGame 
+  } = useGameStore();
 
   const handleStart = () => {
     setGameStatus(GAMESTATUS.started);
   };
 
   return (
-    <div>
+    <div id="app-div">
+      <h1>Pick Your Favorite Song</h1>
       <div>
         <RegionSelectBox region={region} setRegion={setRegion} />
       </div>
@@ -22,7 +28,7 @@ export default function MyApp() {
         {gameStatus === GAMESTATUS.pregame ? (
           <Setup onStart={handleStart} />
         ) : (
-          <div>started</div>
+          <ChoiceContainer/>
         )}
       </div>
     </div>

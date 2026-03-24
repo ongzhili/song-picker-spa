@@ -1,21 +1,28 @@
 import './Setup.css';
 import { useState } from 'react';
+import { useJsonParser } from '../utils/gameState/jsonParser';
+
 
 function Setup({ onStart }: { onStart: () => void }) {
     const [file, setFile] = useState<File | null>(null);
+    const { loadSongsFromFile } = useJsonParser();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFile(e.target.files?.[0] ?? null);
     };
 
-    const handleStartClick = () => {
+    const handleStartClick = async () => {
       if (!file) {
         alert('Please upload a song list JSON file');
         return;
       }
-
-      onStart();
-    };
+      try {
+        await loadSongsFromFile(file);
+        onStart(); // Transition to game screen
+      } catch (err) {
+        alert((err as Error).message);
+      }
+      };
 
     return (
         <div id="setup">

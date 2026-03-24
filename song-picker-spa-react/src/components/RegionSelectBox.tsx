@@ -3,7 +3,7 @@ import "./RegionSelectBox.css";
 
 type RegionSelectBoxProps = {
   region: string;
-  setRegion: React.Dispatch<React.SetStateAction<string>>;
+  setRegion: (region: string) => void;
 };
 
 function RegionSelectBox({ region, setRegion }: RegionSelectBoxProps) {
