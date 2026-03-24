@@ -1,11 +1,15 @@
 import './Setup.css';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useJsonParser } from '../utils/gameState/jsonParser';
+import { useGameStore } from '../utils/gameState/stateStore';
 
 
 function Setup({ onStart }: { onStart: () => void }) {
     const [file, setFile] = useState<File | null>(null);
+    const topLimitRef = useRef<HTMLInputElement>(null);
     const { loadSongsFromFile } = useJsonParser();
+    const { startGame, setTopLimit } = useGameStore();
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFile(e.target.files?.[0] ?? null);
@@ -16,13 +20,20 @@ function Setup({ onStart }: { onStart: () => void }) {
         alert('Please upload a song list JSON file');
         return;
       }
+      const inputValue = topLimitRef.current?.value;
+      const topLimitValue = inputValue && Number(inputValue) > 0 ? Number(inputValue) : Infinity;
+      
+      console.log('Top limit input:', inputValue); // Debug
+      console.log('Parsed top limit:', topLimitValue); // Debug
+
       try {
         await loadSongsFromFile(file);
-        onStart(); // Transition to game screen
+        setTopLimit(topLimitValue);
+        startGame();
       } catch (err) {
         alert((err as Error).message);
       }
-      };
+    };
 
     return (
         <div id="setup">
@@ -38,7 +49,7 @@ function Setup({ onStart }: { onStart: () => void }) {
           <label htmlFor="toplimit-input">
             Top limit:
           </label>
-          <input id="toplimit-input" type="number" placeholder="∞ (no limit)"/>
+          <input ref={topLimitRef} id="toplimit-input" type="number" placeholder="∞ (no limit)"/>
 
           <br /><br />
           <button id="start-btn" onClick={handleStartClick}>Start</button>

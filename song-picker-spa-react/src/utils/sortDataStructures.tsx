@@ -9,10 +9,3 @@ export interface Song {
   mp3?: string;
   audio?: string;
 }
-
-export interface ComparisonPair {
-  left: Song;
-  right: Song;
-  leftArray: Song[];
-  rightArray: Song[];
-}
