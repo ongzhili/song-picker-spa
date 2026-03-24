@@ -8,7 +8,7 @@ function Setup({ onStart }: { onStart: () => void }) {
     const [file, setFile] = useState<File | null>(null);
     const topLimitRef = useRef<HTMLInputElement>(null);
     const { loadSongsFromFile } = useJsonParser();
-    const { startGame, setTopLimit } = useGameStore();
+    const { startGame, setTopLimit, showNewPair } = useGameStore();
 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +30,7 @@ function Setup({ onStart }: { onStart: () => void }) {
         await loadSongsFromFile(file);
         setTopLimit(topLimitValue);
         startGame();
+        showNewPair();
       } catch (err) {
         alert((err as Error).message);
       }

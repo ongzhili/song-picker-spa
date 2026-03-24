@@ -35,6 +35,7 @@ interface GameState {
   setSongs: (songs: Song[]) => void;
   resetGame: () => void;
   postComparisonHandler: () => void;
+  showNewPair: () => void;
 }
 
 const initialState = {
@@ -127,6 +128,8 @@ export const useGameStore = create<GameState>()(
       set((state) => {
         const left = state.currentQueue[state.currentIdx];
         const right = state.currentQueue[state.currentIdx + 1] || [];
+
+        console.log('left:', left, 'right:', right);
         
         return {
           currentLeft: left[0] || null,
