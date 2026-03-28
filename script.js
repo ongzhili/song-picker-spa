@@ -3,6 +3,8 @@ let sortedSongs = [];
 let comparisons = 0;
 let topLimit = Infinity;
 let region = 'nae'; // default
+let localStoragePrefix = '';
+let loadProgress = false;
 const regionSelect = document.getElementById('region-select');
 
 const MEDIA = {
@@ -19,6 +21,7 @@ const songTypeMap = {
 const startBtn = document.getElementById('start-btn');
 const songListInput = document.getElementById('songlist-input');
 const topLimitInput = document.getElementById('toplimit-input');
+const loadProgressInput = document.getElementById('loadprogress-input');
 const setupDiv = document.getElementById('setup');
 
 
@@ -35,7 +38,7 @@ function shuffleArray(arr) {
   }
 }
 
-startBtn.addEventListener('click', () => {
+startBtn.addEventListener('click', async () => {
   const file = songListInput.files[0];
   if (!file) {
     alert('Please upload a song list JSON file');
@@ -47,6 +50,8 @@ startBtn.addEventListener('click', () => {
 
   setupDiv.style.display = 'none';
 
+  localStoragePrefix = await fileHash(file);
+  loadProgress = loadProgressInput.checked && localStorage.getItem(`${localStoragePrefix}-queue`);
   loadSongsFromFile(file);
 });
 
@@ -169,7 +174,11 @@ function getAudioElement(music) {
 
 
 function startInteractiveMergeSort(array) {
-  comparisons = 0;
+  if (loadProgress) {
+    comparisons = parseInt(localStorage.getItem(`${localStoragePrefix}-comparisons`)) ?? 0;
+  } else {
+    comparisons = 0;
+  }
   breadthFirstMergeSort(array, sorted => {
     sortedSongs = sorted;
     displaySortedSongs();
@@ -178,6 +187,11 @@ function startInteractiveMergeSort(array) {
 
 function breadthFirstMergeSort(arr, callback, limit = Infinity) {
   let queue = arr.map(item => [item]);
+  if (loadProgress) {
+    queue = JSON.parse(localStorage.getItem(`${localStoragePrefix}-queue`));
+  } else {
+    localStorage.setItem(`${localStoragePrefix}-queue`, JSON.stringify(queue));
+  }
 
   function nextLevel() {
     if (queue.length === 1) {
@@ -185,22 +199,41 @@ function breadthFirstMergeSort(arr, callback, limit = Infinity) {
       return;
     }
 
-    const nextQueue = [];
+    let nextQueue = [];
     let i = 0;
+    if (loadProgress) {
+      nextQueue = JSON.parse(localStorage.getItem(`${localStoragePrefix}-nextQueue`));
+      i = parseInt(localStorage.getItem(`${localStoragePrefix}-i`));
+    } else {
+      localStorage.setItem(`${localStoragePrefix}-nextQueue`, JSON.stringify(nextQueue));
+      localStorage.setItem(`${localStoragePrefix}-i`, i);
+    }
 
     function mergePair() {
       if (i >= queue.length) {
         queue = nextQueue;
+        localStorage.setItem(`${localStoragePrefix}-queue`, JSON.stringify(queue));
         nextLevel();
         return;
       }
 
-      const left = queue[i];
-      const right = queue[i + 1] || [];
+      let left = queue[i];
+      let right = queue[i + 1] || [];
+      if (loadProgress) {
+        left = JSON.parse(localStorage.getItem(`${localStoragePrefix}-left`));
+        right = JSON.parse(localStorage.getItem(`${localStoragePrefix}-right`));
+      } else {
+        localStorage.setItem(`${localStoragePrefix}-left`, JSON.stringify(left));
+        localStorage.setItem(`${localStoragePrefix}-right`, JSON.stringify(right));
+      }
+
 
       mergeUser(left, right, merged => {
         nextQueue.push(merged);
         i += 2;
+        localStorage.setItem(`${localStoragePrefix}-nextQueue`, JSON.stringify(nextQueue));
+        localStorage.setItem(`${localStoragePrefix}-i`, i);
+        console.log(queue, i)
         mergePair();
       }, limit);
     }
@@ -272,7 +305,14 @@ function destroyMediaContainer(containerDiv) {
 }
 
 function mergeUser(left, right, callback, limit = 10) {
-  const merged = [];
+  let merged = [];
+  if (loadProgress) {
+    merged = JSON.parse(localStorage.getItem(`${localStoragePrefix}-merged`));
+    loadProgress = false;
+  } else {
+    localStorage.setItem(`${localStoragePrefix}-merged`, JSON.stringify(merged));
+  }
+
 
   function nextComparison() {
 
@@ -378,6 +418,10 @@ function mergeUser(left, right, callback, limit = 10) {
         if (index === 0) merged.push(left.shift());
         else merged.push(right.shift());
         comparisons++;
+        localStorage.setItem(`${localStoragePrefix}-comparisons`, comparisons);
+        localStorage.setItem(`${localStoragePrefix}-merged`, JSON.stringify(merged));
+        localStorage.setItem(`${localStoragePrefix}-left`, JSON.stringify(left));
+        localStorage.setItem(`${localStoragePrefix}-right`, JSON.stringify(right));
         nextComparison();
       };
 
@@ -387,6 +431,8 @@ function mergeUser(left, right, callback, limit = 10) {
       skipBtn.onclick = () => {
         if (index === 0) left.shift();
         else right.shift();
+        localStorage.setItem(`${localStoragePrefix}-left`, JSON.stringify(left));
+        localStorage.setItem(`${localStoragePrefix}-right`, JSON.stringify(right));
         nextComparison();
       };
 
@@ -447,4 +493,31 @@ function displaySortedSongs() {
   };
   document.getElementById('sorted-wrapper').appendChild(exportBtn);
 
+}
+
+// The digest function is asynchronous, it returns a promise
+// We use the async/await syntax to simplify the code.
+async function fileHash(file) {
+  const arrayBuffer = await file.arrayBuffer();
+
+  // Use the subtle crypto API to perform a SHA256 Sum of the file's
+  // Array Buffer. The resulting hash is stored in an array buffer
+  const hashAsArrayBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+
+  // To display it as a string we will get the hexadecimal value of
+  // each byte of the array buffer. This gets us an array where each byte
+  // of the array buffer becomes one item in the array
+  const uint8ViewOfHash = new Uint8Array(hashAsArrayBuffer);
+  if (uint8ViewOfHash.toHex) {
+    // The logic below is equivalent to the toHex() method, introduced in 2025.
+    return uint8ViewOfHash.toHex();
+  }
+  // We then convert it to a regular array so we can convert each item
+  // to hexadecimal strings, where characters of 0-9 or a-f represent
+  // a number between 0 and 15, containing 4 bits of information,
+  // so 2 of them is 8 bits (1 byte).
+  const hashAsString = Array.from(uint8ViewOfHash)
+  .map((b) => b.toString(16).padStart(2, "0"))
+  .join("");
+  return hashAsString;
 }
