@@ -1,0 +1,134 @@
+.song-option {
+  width: 45vw;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  background-color: #1e1e1e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.song-option:hover {
+  /* transform: scale(1.03); */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.song-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  color: #f5f5f5;
+}
+
+.media-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 40vh;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-container iframe,
+.media-container video {
+  width: 100%;
+  height: 100%;
+  border: none;
+  object-fit: contain;
+}
+
+.action-buttons {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 10px;
+  margin-top: auto;
+  justify-content: center;
+}
+
+.skip-btn,
+.choose-btn {
+  padding: 8px 16px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  background-color: #388e3c;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 100px;
+}
+
+.skip-btn {
+  background-color: #d32f2f;
+}
+
+.skip-btn:hover {
+  background-color: #b71c1c;
+}
+
+.choose-btn:hover {
+  background-color: #2e7d32;
+}
+
+.media-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.show-media-btn {
+  padding: 10px 16px;
+  font-size: 0.95em;
+  border: none;
+  border-radius: 6px;
+  background-color: #1f5a96;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  flex: 1;
+  max-width: 150px;
+  font-weight: 500;
+}
+
+.show-media-btn:hover {
+  background-color: #1a4a7a;
+  transform: translateY(-2px);
+}
+
+.show-media-btn:active {
+  transform: translateY(0);
+}
+
+p.song-name-text,
+p.song-artist-text,
+p.song-anime-text {
+  margin: 5px 0;
+  font-size: 0.95em;
+  color: #b0b0b0;
+}
+
+p.song-name-text {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 1em;
+}
+
+p.song-artist-text {
+  font-style: italic;
+  color: #a0a0a0;
+}
+
+p.song-type-text,
+p.song-anime-text {
+  font-size: 0.9em;
+  color: #808080;
+}
