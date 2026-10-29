@@ -14,8 +14,15 @@ h1,
 
 #choices {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   margin-top: 20px;
+}
+
+.both-action-buttons {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .song-option {

@@ -447,6 +447,25 @@ function mergeUser(left, right, callback, limit = 10) {
       optionDiv.appendChild(actionButtonsDiv);
       choicesDiv.appendChild(optionDiv);
     });
+
+    const deleteBothDiv = document.createElement('div');
+    deleteBothDiv.className = 'both-action-buttons';
+
+    const deleteBothBtn = document.createElement('button');
+    deleteBothBtn.className = 'skip-btn';
+    deleteBothBtn.textContent = 'Delete Both (Removes permanently!!)';
+    deleteBothBtn.onclick = () => {
+      if (!window.confirm('Delete both songs permanently? This cannot be undone.')) return;
+
+      left.shift();
+      right.shift();
+      localStorage.setItem(`${localStoragePrefix}-left`, JSON.stringify(left));
+      localStorage.setItem(`${localStoragePrefix}-right`, JSON.stringify(right));
+      nextComparison();
+    };
+
+    deleteBothDiv.appendChild(deleteBothBtn);
+    choicesDiv.appendChild(deleteBothDiv);
   }
 
   nextComparison();
